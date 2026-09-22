@@ -2,16 +2,20 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Intentick Preprod Testing Widget</title>
-  <meta name="description" content="Intentick Preprod Testing Widget" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Intentick Preprod Widget Test</title>
+  <meta name="description" content="Intentick Preprod Mobile & Desktop Widget Sandbox" />
+  <meta name="theme-color" content="#090d16" id="theme-color-meta" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Dynamic Script Loader with Default Collect ID -->
+  <!-- Dynamic Script Loader for Intentick Preprod Widget -->
   <script>
     (function () {
       const DEFAULT_COLLECT_ID = "Intentick_widget_r7v9swxw";
@@ -20,311 +24,518 @@
 
       window.__ACTIVE_COLLECT_ID__ = activeId;
 
-      // Inject Intentick widget script
-      const script = document.createElement("script");
-      script.id = "intentick-widget-script";
-      script.src = "https://preprod.intentick.com/intentick_widget.js";
-      script.setAttribute("data-collect-id", activeId);
-      script.async = true;
-      document.head.appendChild(script);
+      function injectWidgetScript() {
+        if (document.getElementById("intentick-widget-script")) return;
+        const script = document.createElement("script");
+        script.id = "intentick-widget-script";
+        script.src = "https://preprod.intentick.com/intentick_widget.js";
+        script.setAttribute("data-collect-id", activeId);
+        script.async = true;
+        (document.body || document.head || document.documentElement).appendChild(script);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", injectWidgetScript);
+      } else {
+        injectWidgetScript();
+      }
     })();
   </script>
 
   <style>
-    /* Dark & Light Theme Variables */
+    /* Design Tokens: Dark & Light Themes */
     :root[data-theme="light"] {
-      --bg: #ffffff;
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-border: #e2e8f0;
       --text: #0f172a;
       --text-muted: #64748b;
-      --card-bg: #f8fafc;
-      --border: #e2e8f0;
+      --text-subtle: #94a3b8;
       --btn-bg: #0f172a;
       --btn-text: #ffffff;
       --btn-hover: #1e293b;
+      --btn-outline-border: #cbd5e1;
       --badge-bg: #f1f5f9;
       --badge-text: #334155;
       --badge-border: #cbd5e1;
+      --chip-bg: #f1f5f9;
+      --chip-text: #475569;
+      --chip-border: #e2e8f0;
       --accent: #4f46e5;
+      --accent-soft: rgba(79, 70, 229, 0.1);
+      --success: #10b981;
     }
 
     :root[data-theme="dark"] {
       --bg: #090d16;
+      --surface: #111827;
+      --surface-border: #1f2937;
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --card-bg: #111827;
-      --border: #1f2937;
+      --text-subtle: #64748b;
       --btn-bg: #f8fafc;
       --btn-text: #090d16;
       --btn-hover: #e2e8f0;
+      --btn-outline-border: #334155;
       --badge-bg: #1e293b;
       --badge-text: #cbd5e1;
       --badge-border: #334155;
+      --chip-bg: #1e293b;
+      --chip-text: #cbd5e1;
+      --chip-border: #334155;
       --accent: #818cf8;
+      --accent-soft: rgba(129, 140, 248, 0.15);
+      --success: #10b981;
     }
 
-    * {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    body {
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      line-height: 1.65;
-      transition: background-color 0.25s ease, color 0.25s ease;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Top Navigation Bar */
+    /* Top Navigation Header */
     header {
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      background: var(--surface);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 0.75rem 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      z-index: 100;
+      gap: 0.75rem;
     }
 
-    .top-left {
+    .brand-wrap {
       display: flex;
       align-items: center;
+      gap: 0.6rem;
+    }
+
+    .brand-logo {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .brand-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+    }
+
+    .theme-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--surface-border);
+      color: var(--text);
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--badge-bg);
+    }
+
+    /* Main Container with Bottom Padding for Mobile Floating Widget */
+    main {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Compact Hero */
+    .hero {
+      text-align: center;
+      padding: 0.5rem 0;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+
+    .lead-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* Minimal Testing Card */
+    .test-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-subtle);
+    }
+
+    .id-display-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 0.75rem;
-      flex-wrap: wrap;
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      overflow: hidden;
+    }
+
+    .id-display-text {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: color 0.15s ease, background 0.15s ease;
+      flex-shrink: 0;
+      touch-action: manipulation;
+    }
+
+    .copy-btn:hover {
+      color: var(--text);
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Actions Row */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 0.4rem;
-      padding: 0.5rem 1rem;
+      padding: 0.65rem 1rem;
       font-size: 0.85rem;
       font-weight: 600;
       font-family: inherit;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       border: 1px solid transparent;
-      transition: all 0.2s ease;
-      text-decoration: none;
+      transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+      touch-action: manipulation;
+      min-height: 42px;
     }
 
-    .btn-main {
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
       background-color: var(--btn-bg);
       color: var(--btn-text);
     }
 
-    .btn-main:hover {
+    .btn-primary:hover {
       background-color: var(--btn-hover);
     }
 
     .btn-outline {
       background: transparent;
       color: var(--text);
-      border: 1px solid var(--border);
+      border: 1px solid var(--btn-outline-border);
     }
 
     .btn-outline:hover {
-      background: var(--card-bg);
-    }
-
-    .id-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 0.75rem;
       background: var(--badge-bg);
-      color: var(--badge-text);
-      border: 1px solid var(--badge-border);
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-family: monospace;
     }
 
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #10b981;
-    }
-
-    .theme-toggle-btn {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.45rem 0.85rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    /* Content Layout */
-    main {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 3rem 1.5rem;
-    }
-
-    .hero {
-      margin-bottom: 2.5rem;
-    }
-
-    .tag {
-      display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    h1 {
-      font-size: 2.25rem;
-      font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 0.75rem;
-    }
-
-    .lead {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-    }
-
-    .content-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.75rem;
-      margin-bottom: 2rem;
-    }
-
-    h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.85rem;
-    }
-
-    p {
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-      font-size: 0.975rem;
-    }
-
-    p:last-child {
-      margin-bottom: 0;
-    }
-
-    .features-list {
-      list-style: none;
+    /* Preset Quick Chips */
+    .presets-section {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 1rem;
+      gap: 0.5rem;
     }
 
-    .features-list li {
+    .presets-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-subtle);
+    }
+
+    .presets-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .preset-chip {
+      background: var(--chip-bg);
+      color: var(--chip-text);
+      border: 1px solid var(--chip-border);
+      border-radius: 6px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.75rem;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+
+    .preset-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .preset-chip.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Mobile Testing Notice */
+    .mobile-tip {
       display: flex;
       align-items: flex-start;
-      gap: 0.6rem;
-      font-size: 0.925rem;
-      color: var(--text);
+      gap: 0.65rem;
+      background: var(--badge-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+      line-height: 1.45;
     }
 
-    .features-list li span.bullet {
-      color: var(--accent);
-      font-weight: bold;
+    .mobile-tip-icon {
+      font-size: 1.1rem;
+      line-height: 1;
+      flex-shrink: 0;
     }
 
+    /* Footer */
     footer {
       text-align: center;
-      padding: 2rem 1rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      margin-top: 3rem;
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+      padding: 1rem;
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 640px) {
+      header {
+        padding: 0.65rem 1rem;
+      }
+
+      .brand-title {
+        font-size: 0.875rem;
+      }
+
+      main {
+        padding: 1.25rem 1rem 6.5rem;
+        gap: 1.25rem;
+      }
+
+      h1 {
+        font-size: 1.35rem;
+      }
+
+      .lead-text {
+        font-size: 0.875rem;
+      }
+
+      .test-card {
+        padding: 1.15rem;
+        gap: 1rem;
+      }
+
+      .actions-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+        min-height: 44px; /* Apple minimum touch target recommendation */
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Header with Top-Left ID Button and Theme Toggle -->
+  <!-- Sticky Mobile-Friendly Header -->
   <header>
-    <div class="top-left">
-      <!-- Built-in prompt & alert button -->
-      <button class="btn btn-main" onclick="changeWidgetId()">
-        Change Widget ID
-      </button>
-
-      <button class="btn btn-outline" onclick="resetWidgetId()">
-        Reset ID
-      </button>
-
-      <span class="id-badge">
-        <span class="dot"></span>
-        <span id="display-id">Intentick_widget_r7v9swxw</span>
+    <div class="brand-wrap">
+      <div class="brand-logo">I</div>
+      <span class="brand-title">Intentick Preprod</span>
+      <span class="status-badge">
+        <span class="pulse-dot"></span>
+        <span>Live</span>
       </span>
     </div>
 
     <div>
-      <button class="theme-toggle-btn" id="theme-btn" onclick="toggleTheme()">
-        <span id="theme-icon">☀️</span> Light Mode
+      <button class="theme-toggle-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle Dark/Light Mode">
+        <span id="theme-icon">☀️</span> <span id="theme-label">Light</span>
       </button>
     </div>
   </header>
 
-  <!-- Clean Content Body -->
+  <!-- Decreased, Clean & Mobile-Optimized Body -->
   <main>
     <section class="hero">
-      <span class="tag">Preprod Environment</span>
-      <h1>Intentick Preprod Testing Widget</h1>
-      <p class="lead">
-        A lightweight testbed to verify the Intentick preprod widget integration and collect ID switching.
+      <span class="hero-pill">Preprod Testbed</span>
+      <h1>Widget Sandbox</h1>
+      <p class="lead-text">
+        Lightweight test environment to verify the Intentick Preprod widget integration, mobile responsiveness, and Collect ID switching.
       </p>
     </section>
 
-    <section class="content-card">
-      <h2>About Intentick</h2>
-      <p>
-        Intentick is a visitor intent intelligence platform designed to identify, analyze, and engage high-intent visitors on your website in real-time. By tracking on-page buyer signals and behavioural indicators, Intentick empowers marketing and revenue teams to deliver personalized engagement when visitor interest is at its peak.
-      </p>
-      <p>
-        This test page integrates the preproduction widget bundle directly from <code>https://preprod.intentick.com/intentick_widget.js</code> with dynamic Collect ID injection.
-      </p>
-    </section>
+    <section class="test-card">
+      <div class="card-header">
+        <span class="card-label">Active Collect ID</span>
+        <div class="id-display-row">
+          <span class="id-display-text" id="display-id">Intentick_widget_r7v9swxw</span>
+          <button class="copy-btn" id="copy-btn" onclick="copyWidgetId()">Copy</button>
+        </div>
+      </div>
 
-    <section class="content-card">
-      <h2>Key Capabilities</h2>
-      <ul class="features-list">
-        <li>
-          <span class="bullet">✔</span>
-          <div><strong>Intent Signal Detection:</strong> Identifies high-value buyer journeys based on content engagement and navigation depth.</div>
-        </li>
-        <li>
-          <span class="bullet">✔</span>
-          <div><strong>Dynamic Widget Delivery:</strong> Serves interactive components and capture triggers tailored to visitor readiness.</div>
-        </li>
-        <li>
-          <span class="bullet">✔</span>
-          <div><strong>Real-time Analytics:</strong> Seamlessly synchronizes interaction events with your revenue pipeline and data stack.</div>
-        </li>
-      </ul>
+      <!-- Action Buttons -->
+      <div class="actions-grid">
+        <button class="btn btn-primary" onclick="changeWidgetId()">
+          ✏️ Change Widget ID
+        </button>
+        <button class="btn btn-outline" onclick="resetWidgetId()">
+          ↺ Reset to Default
+        </button>
+      </div>
+
+      <!-- Quick Preset Selection for Easy Mobile Testing -->
+      <div class="presets-section">
+        <span class="presets-label">Quick Test Presets:</span>
+        <div class="presets-chips">
+          <button class="preset-chip" onclick="applyPresetId('Intentick_widget_r7v9swxw')">r7v9swxw (Default)</button>
+          <button class="preset-chip" onclick="applyPresetId('Intentick_widget_yhcbqgno')">yhcbqgno</button>
+          <button class="preset-chip" onclick="applyPresetId('Intentick_widget_2yxibb5u')">2yxibb5u</button>
+        </div>
+      </div>
+
+      <!-- Mobile Tip -->
+      <div class="mobile-tip">
+        <span class="mobile-tip-icon">📱</span>
+        <span>
+          <strong>Mobile Testing Tip:</strong> Tap the floating chat launcher icon in the bottom-right corner to open the widget in full mobile responsive view.
+        </span>
+      </div>
     </section>
   </main>
 
   <footer>
-    <p>Intentick Preprod Testing &bull; Default Collect ID: <code>Intentick_widget_r7v9swxw</code></p>
+    <p>Intentick Preprod &bull; Script: <code>preprod.intentick.com/intentick_widget.js</code></p>
   </footer>
 
-  <!-- Script for ID switching and Dark/Light Mode toggle -->
+  <!-- State & Interactive Handlers -->
   <script>
     const DEFAULT_ID = "Intentick_widget_r7v9swxw";
 
@@ -333,12 +544,11 @@
       return urlParams.get("collect_id") || localStorage.getItem("intentick_collect_id") || DEFAULT_ID;
     }
 
-    // Top-left button: Built-in prompt & alert to change Collect ID
     function changeWidgetId() {
       const current = getActiveId();
       const input = window.prompt("Enter Intentick Collect ID:", current);
 
-      if (input === null) return; // User cancelled
+      if (input === null) return;
 
       const newId = input.trim();
       if (!newId) {
@@ -346,31 +556,42 @@
         return;
       }
 
-      // Persist new ID
       localStorage.setItem("intentick_collect_id", newId);
-
       const url = new URL(window.location.href);
       url.searchParams.set("collect_id", newId);
-
-      // Built-in alert confirmation
-      window.alert("Intentick Collect ID updated to: " + newId + "\n\nReloading page with the new script ID...");
-
-      // Reload with new ID
       window.location.href = url.toString();
     }
 
-    // Reset to default
     function resetWidgetId() {
       if (confirm("Reset Collect ID back to default (" + DEFAULT_ID + ")?")) {
         localStorage.removeItem("intentick_collect_id");
         const url = new URL(window.location.href);
         url.searchParams.delete("collect_id");
-        window.alert("Reset back to default: " + DEFAULT_ID);
         window.location.href = url.toString();
       }
     }
 
-    // Dark / Light Mode Toggle
+    function applyPresetId(presetId) {
+      if (getActiveId() === presetId) return;
+      localStorage.setItem("intentick_collect_id", presetId);
+      const url = new URL(window.location.href);
+      url.searchParams.set("collect_id", presetId);
+      window.location.href = url.toString();
+    }
+
+    function copyWidgetId() {
+      const id = getActiveId();
+      navigator.clipboard.writeText(id).then(() => {
+        const btn = document.getElementById("copy-btn");
+        if (btn) {
+          btn.textContent = "Copied!";
+          setTimeout(() => { btn.textContent = "Copy"; }, 2000);
+        }
+      }).catch(() => {
+        window.prompt("Copy Collect ID:", id);
+      });
+    }
+
     function toggleTheme() {
       const html = document.documentElement;
       const currentTheme = html.getAttribute("data-theme") || "dark";
@@ -378,28 +599,40 @@
 
       html.setAttribute("data-theme", newTheme);
       localStorage.setItem("intentick_theme", newTheme);
-      updateThemeButton(newTheme);
+      updateThemeDisplay(newTheme);
     }
 
-    function updateThemeButton(theme) {
-      const btn = document.getElementById("theme-btn");
-      if (!btn) return;
+    function updateThemeDisplay(theme) {
+      const icon = document.getElementById("theme-icon");
+      const label = document.getElementById("theme-label");
+      const themeColor = document.getElementById("theme-color-meta");
+
       if (theme === "dark") {
-        btn.innerHTML = `<span>☀️</span> Light Mode`;
+        if (icon) icon.textContent = "☀️";
+        if (label) label.textContent = "Light";
+        if (themeColor) themeColor.setAttribute("content", "#090d16");
       } else {
-        btn.innerHTML = `<span>🌙</span> Dark Mode`;
+        if (icon) icon.textContent = "🌙";
+        if (label) label.textContent = "Dark";
+        if (themeColor) themeColor.setAttribute("content", "#ffffff");
       }
     }
 
-    // Initialize display & theme on load
     document.addEventListener("DOMContentLoaded", function () {
       const activeId = getActiveId();
       const displayEl = document.getElementById("display-id");
       if (displayEl) displayEl.textContent = activeId;
 
+      // Highlight active preset chip
+      document.querySelectorAll(".preset-chip").forEach((chip) => {
+        if (chip.textContent.includes(activeId.split("_").pop())) {
+          chip.classList.add("active");
+        }
+      });
+
       const savedTheme = localStorage.getItem("intentick_theme") || "dark";
       document.documentElement.setAttribute("data-theme", savedTheme);
-      updateThemeButton(savedTheme);
+      updateThemeDisplay(savedTheme);
     });
   </script>
 </body>
