@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Intentick Preprod Widget Test</title>
-  <meta name="description" content="Intentick Preprod Mobile & Desktop Widget Sandbox" />
-  <meta name="theme-color" content="#090d16" id="theme-color-meta" />
+  <title>Intentick Preprod Testing Widget</title>
+  <meta name="description" content="Intentick Preprod Mobile & Desktop Testing" />
+  <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Dynamic Script Loader for Intentick Preprod Widget -->
+  <!-- Dynamic Script Loader for Preprod Widget -->
   <script>
     (function () {
       const DEFAULT_COLLECT_ID = "Intentick_widget_r7v9swxw";
@@ -43,48 +43,36 @@
   </script>
 
   <style>
-    /* Design Tokens: Dark & Light Themes */
+    /* Clean Light & Dark Mode Tokens */
     :root[data-theme="light"] {
-      --bg: #f8fafc;
+      --bg: #ffffff;
       --surface: #ffffff;
-      --surface-border: #e2e8f0;
+      --border: #e2e8f0;
       --text: #0f172a;
       --text-muted: #64748b;
-      --text-subtle: #94a3b8;
       --btn-bg: #0f172a;
       --btn-text: #ffffff;
       --btn-hover: #1e293b;
-      --btn-outline-border: #cbd5e1;
-      --badge-bg: #f1f5f9;
+      --badge-bg: #f8fafc;
+      --badge-border: #e2e8f0;
       --badge-text: #334155;
-      --badge-border: #cbd5e1;
-      --chip-bg: #f1f5f9;
-      --chip-text: #475569;
-      --chip-border: #e2e8f0;
       --accent: #4f46e5;
-      --accent-soft: rgba(79, 70, 229, 0.1);
       --success: #10b981;
     }
 
     :root[data-theme="dark"] {
-      --bg: #090d16;
+      --bg: #0b0f19;
       --surface: #111827;
-      --surface-border: #1f2937;
+      --border: #1f2937;
       --text: #f8fafc;
       --text-muted: #94a3b8;
-      --text-subtle: #64748b;
       --btn-bg: #f8fafc;
-      --btn-text: #090d16;
+      --btn-text: #0b0f19;
       --btn-hover: #e2e8f0;
-      --btn-outline-border: #334155;
       --badge-bg: #1e293b;
-      --badge-text: #cbd5e1;
       --badge-border: #334155;
-      --chip-bg: #1e293b;
-      --chip-text: #cbd5e1;
-      --chip-border: #334155;
+      --badge-text: #cbd5e1;
       --accent: #818cf8;
-      --accent-soft: rgba(129, 140, 248, 0.15);
       --success: #10b981;
     }
 
@@ -109,433 +97,271 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Top Navigation Header */
+    /* Top Navigation Header with Change Widget ID on Top-Left */
     header {
       position: sticky;
       top: 0;
       z-index: 50;
       width: 100%;
       background: var(--surface);
-      border-bottom: 1px solid var(--surface-border);
-      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      padding: 0.65rem 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
-    .brand-wrap {
+    /* Top-Left Action Area */
+    .top-left {
       display: flex;
       align-items: center;
       gap: 0.6rem;
+      flex-wrap: wrap;
     }
 
-    .brand-logo {
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
-      background: linear-gradient(135deg, #4f46e5, #06b6d4);
-      display: flex;
+    .btn-action {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-weight: 700;
-      font-size: 0.85rem;
+      gap: 0.4rem;
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+      min-height: 36px;
     }
 
-    .brand-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
+    .btn-action:hover {
+      background: var(--btn-hover);
+    }
+
+    .btn-action:active {
+      transform: scale(0.98);
+    }
+
+    .btn-reset {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+      min-height: 36px;
+    }
+
+    .btn-reset:hover {
       color: var(--text);
+      background: var(--badge-bg);
     }
 
-    .status-badge {
+    .id-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.2rem 0.55rem;
-      border-radius: 9999px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      background: var(--accent-soft);
-      color: var(--accent);
-      border: 1px solid var(--accent);
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      border-radius: 7px;
+      padding: 0.4rem 0.65rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      font-size: 0.78rem;
+      color: var(--badge-text);
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .pulse-dot {
-      width: 6px;
-      height: 6px;
+    .dot-live {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: var(--success);
       box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+      flex-shrink: 0;
+    }
+
+    /* Top-Right Theme Toggle */
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .theme-toggle-btn {
       background: transparent;
-      border: 1px solid var(--surface-border);
+      border: 1px solid var(--border);
       color: var(--text);
       padding: 0.4rem 0.75rem;
-      border-radius: 8px;
+      border-radius: 7px;
       font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      transition: background 0.15s ease, border-color 0.15s ease;
+      transition: all 0.15s ease;
       touch-action: manipulation;
+      min-height: 36px;
     }
 
     .theme-toggle-btn:hover {
       background: var(--badge-bg);
     }
 
-    /* Main Container with Bottom Padding for Mobile Floating Widget */
+    /* Simple, Light & Minimal Content Area */
     main {
       width: 100%;
-      max-width: 680px;
+      max-width: 600px;
       margin: 0 auto;
-      padding: 2rem 1.25rem 7rem;
+      padding: 5rem 1.25rem 6rem;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    /* Compact Hero */
-    .hero {
+      align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 0.5rem 0;
+      min-height: calc(100vh - 120px);
     }
 
-    .hero-pill {
+    .minimal-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .pill-status {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      background: rgba(79, 70, 229, 0.08);
       color: var(--accent);
-      margin-bottom: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
     }
 
     h1 {
-      font-size: 1.75rem;
+      font-size: 1.65rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       line-height: 1.25;
-      margin-bottom: 0.5rem;
+      color: var(--text);
     }
 
-    .lead-text {
+    p.subtext {
       font-size: 0.95rem;
       color: var(--text-muted);
-      max-width: 520px;
-      margin: 0 auto;
+      max-width: 440px;
+      line-height: 1.55;
     }
 
-    /* Minimal Testing Card */
-    .test-card {
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-    }
-
-    .card-header {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-    }
-
-    .card-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-subtle);
-    }
-
-    .id-display-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      background: var(--badge-bg);
-      border: 1px solid var(--badge-border);
-      border-radius: 8px;
-      padding: 0.6rem 0.85rem;
-      overflow: hidden;
-    }
-
-    .id-display-text {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .copy-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      transition: color 0.15s ease, background 0.15s ease;
-      flex-shrink: 0;
-      touch-action: manipulation;
-    }
-
-    .copy-btn:hover {
-      color: var(--text);
-      background: rgba(0, 0, 0, 0.05);
-    }
-
-    /* Actions Row */
-    .actions-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.4rem;
-      padding: 0.65rem 1rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      font-family: inherit;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
-      touch-action: manipulation;
-      min-height: 42px;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .btn-primary {
-      background-color: var(--btn-bg);
-      color: var(--btn-text);
-    }
-
-    .btn-primary:hover {
-      background-color: var(--btn-hover);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--btn-outline-border);
-    }
-
-    .btn-outline:hover {
-      background: var(--badge-bg);
-    }
-
-    /* Preset Quick Chips */
-    .presets-section {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .presets-label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-subtle);
-    }
-
-    .presets-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .preset-chip {
-      background: var(--chip-bg);
-      color: var(--chip-text);
-      border: 1px solid var(--chip-border);
-      border-radius: 6px;
-      padding: 0.35rem 0.65rem;
-      font-size: 0.75rem;
-      font-family: ui-monospace, SFMono-Regular, monospace;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      touch-action: manipulation;
-    }
-
-    .preset-chip:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .preset-chip.active {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    /* Mobile Testing Notice */
-    .mobile-tip {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.65rem;
-      background: var(--badge-bg);
-      border: 1px solid var(--surface-border);
-      border-radius: 8px;
-      padding: 0.85rem 1rem;
-      font-size: 0.825rem;
-      color: var(--text-muted);
-      line-height: 1.45;
-    }
-
-    .mobile-tip-icon {
-      font-size: 1.1rem;
-      line-height: 1;
-      flex-shrink: 0;
-    }
-
-    /* Footer */
+    /* Minimal Footer with Safe Area */
     footer {
       text-align: center;
       font-size: 0.75rem;
-      color: var(--text-subtle);
-      padding: 1rem;
-      padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+      color: var(--text-muted);
+      padding: 1.25rem 1rem;
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), 1.25rem);
     }
 
-    /* Mobile Adjustments */
+    /* Mobile Responsive Optimizations */
     @media (max-width: 640px) {
       header {
-        padding: 0.65rem 1rem;
+        padding: 0.5rem 0.85rem;
+        gap: 0.5rem;
       }
 
-      .brand-title {
-        font-size: 0.875rem;
+      .top-left {
+        gap: 0.45rem;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .id-badge {
+        max-width: 160px;
+        font-size: 0.74rem;
+        padding: 0.35rem 0.5rem;
+      }
+
+      .btn-action {
+        font-size: 0.78rem;
+        padding: 0.4rem 0.7rem;
+      }
+
+      .top-right {
+        margin-left: auto;
       }
 
       main {
-        padding: 1.25rem 1rem 6.5rem;
-        gap: 1.25rem;
+        padding: 3rem 1rem 6rem;
       }
 
       h1 {
         font-size: 1.35rem;
       }
 
-      .lead-text {
-        font-size: 0.875rem;
-      }
-
-      .test-card {
-        padding: 1.15rem;
-        gap: 1rem;
-      }
-
-      .actions-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .btn {
-        width: 100%;
-        min-height: 44px; /* Apple minimum touch target recommendation */
+      p.subtext {
+        font-size: 0.88rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Sticky Mobile-Friendly Header -->
+  <!-- Top Navigation Header with Change Widget Option on Top-Left -->
   <header>
-    <div class="brand-wrap">
-      <div class="brand-logo">I</div>
-      <span class="brand-title">Intentick Preprod</span>
-      <span class="status-badge">
-        <span class="pulse-dot"></span>
-        <span>Live</span>
+    <div class="top-left">
+      <button class="btn-action" onclick="changeWidgetId()" aria-label="Change Widget ID">
+        ✏️ Change Widget ID
+      </button>
+
+      <button class="btn-reset" onclick="resetWidgetId()" title="Reset to default ID" aria-label="Reset Collect ID">
+        ↺
+      </button>
+
+      <span class="id-badge" title="Active Collect ID">
+        <span class="dot-live"></span>
+        <span id="display-id">Intentick_widget_r7v9swxw</span>
       </span>
     </div>
 
-    <div>
+    <div class="top-right">
       <button class="theme-toggle-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle Dark/Light Mode">
-        <span id="theme-icon">☀️</span> <span id="theme-label">Light</span>
+        <span id="theme-icon">🌙</span> <span id="theme-label">Dark</span>
       </button>
     </div>
   </header>
 
-  <!-- Decreased, Clean & Mobile-Optimized Body -->
+  <!-- Clean, Simple & Light Background -->
   <main>
-    <section class="hero">
-      <span class="hero-pill">Preprod Testbed</span>
-      <h1>Widget Sandbox</h1>
-      <p class="lead-text">
-        Lightweight test environment to verify the Intentick Preprod widget integration, mobile responsiveness, and Collect ID switching.
+    <div class="minimal-wrap">
+      <span class="pill-status">Preprod Environment</span>
+      <h1>Intentick Preprod Testing</h1>
+      <p class="subtext">
+        Lightweight host page for testing the Intentick widget script on mobile and desktop devices.
       </p>
-    </section>
-
-    <section class="test-card">
-      <div class="card-header">
-        <span class="card-label">Active Collect ID</span>
-        <div class="id-display-row">
-          <span class="id-display-text" id="display-id">Intentick_widget_r7v9swxw</span>
-          <button class="copy-btn" id="copy-btn" onclick="copyWidgetId()">Copy</button>
-        </div>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="actions-grid">
-        <button class="btn btn-primary" onclick="changeWidgetId()">
-          ✏️ Change Widget ID
-        </button>
-        <button class="btn btn-outline" onclick="resetWidgetId()">
-          ↺ Reset to Default
-        </button>
-      </div>
-
-      <!-- Quick Preset Selection for Easy Mobile Testing -->
-      <div class="presets-section">
-        <span class="presets-label">Quick Test Presets:</span>
-        <div class="presets-chips">
-          <button class="preset-chip" onclick="applyPresetId('Intentick_widget_r7v9swxw')">r7v9swxw (Default)</button>
-          <button class="preset-chip" onclick="applyPresetId('Intentick_widget_yhcbqgno')">yhcbqgno</button>
-          <button class="preset-chip" onclick="applyPresetId('Intentick_widget_2yxibb5u')">2yxibb5u</button>
-        </div>
-      </div>
-
-      <!-- Mobile Tip -->
-      <div class="mobile-tip">
-        <span class="mobile-tip-icon">📱</span>
-        <span>
-          <strong>Mobile Testing Tip:</strong> Tap the floating chat launcher icon in the bottom-right corner to open the widget in full mobile responsive view.
-        </span>
-      </div>
-    </section>
+    </div>
   </main>
 
   <footer>
-    <p>Intentick Preprod &bull; Script: <code>preprod.intentick.com/intentick_widget.js</code></p>
+    <p>Intentick Preprod &bull; <code>https://preprod.intentick.com/intentick_widget.js</code></p>
   </footer>
 
-  <!-- State & Interactive Handlers -->
+  <!-- Script Logic for ID Switching and Theme Toggle -->
   <script>
     const DEFAULT_ID = "Intentick_widget_r7v9swxw";
 
@@ -571,30 +397,9 @@
       }
     }
 
-    function applyPresetId(presetId) {
-      if (getActiveId() === presetId) return;
-      localStorage.setItem("intentick_collect_id", presetId);
-      const url = new URL(window.location.href);
-      url.searchParams.set("collect_id", presetId);
-      window.location.href = url.toString();
-    }
-
-    function copyWidgetId() {
-      const id = getActiveId();
-      navigator.clipboard.writeText(id).then(() => {
-        const btn = document.getElementById("copy-btn");
-        if (btn) {
-          btn.textContent = "Copied!";
-          setTimeout(() => { btn.textContent = "Copy"; }, 2000);
-        }
-      }).catch(() => {
-        window.prompt("Copy Collect ID:", id);
-      });
-    }
-
     function toggleTheme() {
       const html = document.documentElement;
-      const currentTheme = html.getAttribute("data-theme") || "dark";
+      const currentTheme = html.getAttribute("data-theme") || "light";
       const newTheme = currentTheme === "dark" ? "light" : "dark";
 
       html.setAttribute("data-theme", newTheme);
@@ -610,7 +415,7 @@
       if (theme === "dark") {
         if (icon) icon.textContent = "☀️";
         if (label) label.textContent = "Light";
-        if (themeColor) themeColor.setAttribute("content", "#090d16");
+        if (themeColor) themeColor.setAttribute("content", "#0b0f19");
       } else {
         if (icon) icon.textContent = "🌙";
         if (label) label.textContent = "Dark";
@@ -623,14 +428,7 @@
       const displayEl = document.getElementById("display-id");
       if (displayEl) displayEl.textContent = activeId;
 
-      // Highlight active preset chip
-      document.querySelectorAll(".preset-chip").forEach((chip) => {
-        if (chip.textContent.includes(activeId.split("_").pop())) {
-          chip.classList.add("active");
-        }
-      });
-
-      const savedTheme = localStorage.getItem("intentick_theme") || "dark";
+      const savedTheme = localStorage.getItem("intentick_theme") || "light";
       document.documentElement.setAttribute("data-theme", savedTheme);
       updateThemeDisplay(savedTheme);
     });
