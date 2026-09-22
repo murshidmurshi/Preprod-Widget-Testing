@@ -1,79 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Intentick Preprod Testing Widget</title>
-  <meta name="description" content="Testbed and dynamic script loader for Intentick Preprod Widget with custom collect ID management." />
-  
-  <!-- Modern Google Font -->
+  <meta name="description" content="Intentick Preprod Testing Widget" />
+
+  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Script initialization with default ID and dynamic override logic -->
+  <!-- Dynamic Script Loader with Default Collect ID -->
   <script>
     (function () {
       const DEFAULT_COLLECT_ID = "Intentick_widget_r7v9swxw";
-      const SCRIPT_SRC = "https://preprod.intentick.com/intentick_widget.js";
-
-      // 1. Resolve active collect ID (URL param -> localStorage -> default)
       const urlParams = new URLSearchParams(window.location.search);
-      const queryId = urlParams.get("collect_id");
-      const savedId = localStorage.getItem("intentick_collect_id");
-      const activeCollectId = (queryId && queryId.trim()) || (savedId && savedId.trim()) || DEFAULT_COLLECT_ID;
+      const activeId = urlParams.get("collect_id") || localStorage.getItem("intentick_collect_id") || DEFAULT_COLLECT_ID;
 
-      // Expose globally for UI inspection
-      window.__INTENTICK_CONFIG__ = {
-        defaultId: DEFAULT_COLLECT_ID,
-        activeId: activeCollectId,
-        scriptSrc: SCRIPT_SRC,
-        loadedAt: new Date().toISOString()
-      };
+      window.__ACTIVE_COLLECT_ID__ = activeId;
 
-      // 2. Inject the Intentick script element dynamically
-      const scriptEl = document.createElement("script");
-      scriptEl.id = "intentick-widget-script";
-      scriptEl.src = SCRIPT_SRC;
-      scriptEl.setAttribute("data-collect-id", activeCollectId);
-      scriptEl.async = true;
-
-      scriptEl.onload = function () {
-        console.log("%c[Intentick Widget] Script loaded successfully! data-collect-id: " + activeCollectId, "color: #10b981; font-weight: bold;");
-        if (window.logEvent) {
-          window.logEvent("SCRIPT_LOADED", "Intentick script successfully loaded with data-collect-id: " + activeCollectId);
-        }
-      };
-
-      scriptEl.onerror = function (err) {
-        console.warn("[Intentick Widget] Note: Widget script load event errored or was blocked.", err);
-        if (window.logEvent) {
-          window.logEvent("SCRIPT_ERROR", "Failed to load script from " + SCRIPT_SRC);
-        }
-      };
-
-      document.head.appendChild(scriptEl);
+      // Inject Intentick widget script
+      const script = document.createElement("script");
+      script.id = "intentick-widget-script";
+      script.src = "https://preprod.intentick.com/intentick_widget.js";
+      script.setAttribute("data-collect-id", activeId);
+      script.async = true;
+      document.head.appendChild(script);
     })();
   </script>
 
   <style>
-    :root {
-      --bg-primary: #0a0d14;
-      --bg-secondary: #101623;
-      --bg-card: #151d30;
-      --bg-card-hover: #1b253d;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-highlight: rgba(99, 102, 241, 0.4);
-      --text-main: #f3f4f6;
+    /* Dark & Light Theme Variables */
+    :root[data-theme="light"] {
+      --bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --card-bg: #f8fafc;
+      --border: #e2e8f0;
+      --btn-bg: #0f172a;
+      --btn-text: #ffffff;
+      --btn-hover: #1e293b;
+      --badge-bg: #f1f5f9;
+      --badge-text: #334155;
+      --badge-border: #cbd5e1;
+      --accent: #4f46e5;
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #090d16;
+      --text: #f8fafc;
       --text-muted: #94a3b8;
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --primary-glow: rgba(99, 102, 241, 0.25);
-      --accent: #06b6d4;
-      --accent-green: #10b981;
-      --accent-amber: #f59e0b;
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --btn-bg: #f8fafc;
+      --btn-text: #090d16;
+      --btn-hover: #e2e8f0;
+      --badge-bg: #1e293b;
+      --badge-text: #cbd5e1;
+      --badge-border: #334155;
+      --accent: #818cf8;
     }
 
     * {
@@ -83,36 +69,29 @@
     }
 
     body {
-      background-color: var(--bg-primary);
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.12) 0px, transparent 50%),
-        radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
-      color: var(--text-main);
-      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      line-height: 1.6;
-      overflow-x: hidden;
+      line-height: 1.65;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    /* Top Action Bar (Dedicated top-left button as requested) */
-    .top-action-bar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(10, 13, 20, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border-color);
-      padding: 0.75rem 1.5rem;
+    /* Top Navigation Bar */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
     }
 
-    .top-left-controls {
+    .top-left {
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -122,821 +101,305 @@
     .btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.55rem 1.1rem;
-      font-size: 0.875rem;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      font-family: var(--font-sans);
-      border-radius: 8px;
+      font-family: inherit;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid transparent;
+      transition: all 0.2s ease;
       text-decoration: none;
-      outline: none;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
-      color: #ffffff;
-      box-shadow: 0 4px 14px var(--primary-glow);
+    .btn-main {
+      background-color: var(--btn-bg);
+      color: var(--btn-text);
     }
 
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #4f46e5, #4338ca);
-      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-      transform: translateY(-1px);
+    .btn-main:hover {
+      background-color: var(--btn-hover);
     }
 
-    .btn-secondary {
-      background: var(--bg-card);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
     }
 
-    .btn-secondary:hover {
-      background: var(--bg-card-hover);
-      border-color: rgba(255, 255, 255, 0.2);
-      transform: translateY(-1px);
+    .btn-outline:hover {
+      background: var(--card-bg);
     }
 
-    .btn-sm {
-      padding: 0.35rem 0.75rem;
-      font-size: 0.775rem;
-    }
-
-    .id-pill {
+    .id-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.4rem 0.85rem;
-      background: rgba(99, 102, 241, 0.12);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      border-radius: 9999px;
-      font-family: var(--font-mono);
+      padding: 0.4rem 0.75rem;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      border: 1px solid var(--badge-border);
+      border-radius: 6px;
       font-size: 0.8rem;
-      color: #c7d2fe;
+      font-family: monospace;
     }
 
-    .id-pill .dot {
-      width: 8px;
-      height: 8px;
+    .dot {
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: #10b981;
-      box-shadow: 0 0 8px #10b981;
-      animation: pulse 2s infinite;
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.9); }
-    }
-
-    .top-right-meta {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .badge-env {
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 0.25rem 0.6rem;
+    .theme-toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.45rem 0.85rem;
       border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.725rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Container */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2.5rem 1.5rem;
-    }
-
-    /* Header Section */
-    .hero-header {
-      text-align: center;
-      margin-bottom: 3rem;
-      position: relative;
-    }
-
-    .hero-header .eyebrow {
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 1rem;
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      border-radius: 9999px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #a5b4fc;
-      margin-bottom: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      gap: 0.4rem;
     }
 
-    .hero-header h1 {
-      font-size: clamp(2rem, 4vw, 3.25rem);
-      font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-header p {
-      font-size: 1.125rem;
-      color: var(--text-muted);
-      max-width: 680px;
+    /* Content Layout */
+    main {
+      max-width: 800px;
       margin: 0 auto;
+      padding: 3rem 1.5rem;
     }
 
-    /* Grid Layout */
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+    .hero {
+      margin-bottom: 2.5rem;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .lead {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.75rem;
       margin-bottom: 2rem;
     }
 
-    @media (max-width: 860px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.85rem;
     }
 
-    /* Cards */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 14px;
-      padding: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-      transition: border-color 0.2s, box-shadow 0.2s;
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      font-size: 0.975rem;
     }
 
-    .card:hover {
-      border-color: rgba(99, 102, 241, 0.3);
+    p:last-child {
+      margin-bottom: 0;
     }
 
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.85rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #fff;
-    }
-
-    /* Code Snippet Box */
-    .code-preview {
-      background: #07090f;
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 1rem;
-      font-family: var(--font-mono);
-      font-size: 0.825rem;
-      color: #38bdf8;
-      overflow-x: auto;
-      position: relative;
-      line-height: 1.6;
-    }
-
-    .code-tag { color: #f43f5e; }
-    .code-attr { color: #a78bfa; }
-    .code-str { color: #34d399; }
-
-    /* Key-Value Details */
-    .detail-list {
+    .features-list {
+      list-style: none;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
       margin-top: 1rem;
     }
 
-    .detail-item {
+    .features-list li {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.875rem;
-      padding: 0.6rem 0.85rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-    }
-
-    .detail-label {
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .detail-val {
-      font-family: var(--font-mono);
-      color: #e2e8f0;
-      font-weight: 500;
-    }
-
-    /* Interactive Test Section */
-    .section-title {
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: #fff;
-      display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 0.6rem;
+      font-size: 0.925rem;
+      color: var(--text);
     }
 
-    .interactive-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2rem;
-    }
-
-    .action-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.25rem;
-      text-align: left;
-    }
-
-    .action-card h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #fff;
-    }
-
-    .action-card p {
-      font-size: 0.825rem;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-    }
-
-    /* Form Styles */
-    .test-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      text-align: left;
-    }
-
-    .form-group label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .form-input {
-      background: #090d16;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 0.6rem 0.85rem;
-      color: #fff;
-      font-family: var(--font-sans);
-      font-size: 0.875rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .form-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-glow);
-    }
-
-    /* Activity Console Log */
-    .console-card {
-      background: #07090f;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-top: 2rem;
-    }
-
-    .console-logs {
-      font-family: var(--font-mono);
-      font-size: 0.8rem;
-      color: #94a3b8;
-      max-height: 220px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      padding-top: 0.5rem;
-    }
-
-    .log-line {
-      display: flex;
-      gap: 0.6rem;
-      line-height: 1.4;
-    }
-
-    .log-time {
-      color: #64748b;
-      user-select: none;
-    }
-
-    .log-type {
-      font-weight: 600;
-      color: #818cf8;
-    }
-
-    .log-msg {
-      color: #cbd5e1;
-    }
-
-    /* Toast Notification */
-    #toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: #1e293b;
-      color: #fff;
-      padding: 0.75rem 1.25rem;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s ease;
-      z-index: 9999;
-      pointer-events: none;
-    }
-
-    #toast.show {
-      transform: translateY(0);
-      opacity: 1;
+    .features-list li span.bullet {
+      color: var(--accent);
+      font-weight: bold;
     }
 
     footer {
       text-align: center;
-      padding: 3rem 1rem 2rem;
+      padding: 2rem 1rem;
       font-size: 0.8rem;
-      color: #64748b;
-      border-top: 1px solid var(--border-color);
-      margin-top: 4rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- Sticky Top Action Bar with Top-Left ID Change Button -->
-  <header class="top-action-bar">
-    <div class="top-left-controls">
-      <!-- User requested button in top-left to enter/change the ID using built-in prompt & alert -->
-      <button id="btn-change-id" class="btn btn-primary" onclick="openChangeIdPrompt()" title="Click to enter/change Intentick Collect ID">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20h9"></path>
-          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-        </svg>
+  <!-- Header with Top-Left ID Button and Theme Toggle -->
+  <header>
+    <div class="top-left">
+      <!-- Built-in prompt & alert button -->
+      <button class="btn btn-main" onclick="changeWidgetId()">
         Change Widget ID
       </button>
 
-      <button id="btn-reset-id" class="btn btn-secondary btn-sm" onclick="resetToDefaultId()" title="Reset to default: Intentick_widget_r7v9swxw">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="1 4 1 10 7 10"></polyline>
-          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-        </svg>
-        Reset to Default
+      <button class="btn btn-outline" onclick="resetWidgetId()">
+        Reset ID
       </button>
 
-      <div class="id-pill" id="id-pill-display" title="Active Intentick Collect ID">
+      <span class="id-badge">
         <span class="dot"></span>
-        <span>ID: <strong id="current-id-display">Intentick_widget_r7v9swxw</strong></span>
-      </div>
+        <span id="display-id">Intentick_widget_r7v9swxw</span>
+      </span>
     </div>
 
-    <div class="top-right-meta">
-      <span class="badge-env">Preprod Environment</span>
-      <button class="btn btn-secondary btn-sm" onclick="copyCurrentScriptTag()" title="Copy script embed tag">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-        </svg>
-        Copy Script
+    <div>
+      <button class="theme-toggle-btn" id="theme-btn" onclick="toggleTheme()">
+        <span id="theme-icon">☀️</span> Light Mode
       </button>
     </div>
   </header>
 
-  <main class="container">
-    <!-- Hero Header with requested title -->
-    <section class="hero-header">
-      <div class="eyebrow">
-        <span>●</span> Live Integration Sandbox
-      </div>
-      <h1 id="main-heading">Intentick Preprod Testing Widget</h1>
-      <p>
-        Verify widget loading, test visitor intent signals, click tracking, and form events with real-time Collect ID switching.
+  <!-- Clean Content Body -->
+  <main>
+    <section class="hero">
+      <span class="tag">Preprod Environment</span>
+      <h1>Intentick Preprod Testing Widget</h1>
+      <p class="lead">
+        A lightweight testbed to verify the Intentick preprod widget integration and collect ID switching.
       </p>
     </section>
 
-    <!-- Status & Configuration Overview -->
-    <div class="grid-2">
-      <!-- Card 1: Active Script Details -->
-      <section class="card">
-        <div class="card-header">
-          <h2 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
-              <polyline points="16 18 22 12 16 6"></polyline>
-              <polyline points="8 6 2 12 8 18"></polyline>
-            </svg>
-            Active Script Tag
-          </h2>
-          <span id="script-status-badge" style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">
-            Injected in Head
-          </span>
-        </div>
-
-        <div class="code-preview" id="script-code-box">
-          &lt;<span class="code-tag">script</span><br />
-          &nbsp;&nbsp;<span class="code-attr">src</span>=<span class="code-str">"https://preprod.intentick.com/intentick_widget.js"</span><br />
-          &nbsp;&nbsp;<span class="code-attr">data-collect-id</span>=<span class="code-str">"<span id="code-snippet-id">Intentick_widget_r7v9swxw</span>"</span><br />
-          &nbsp;&nbsp;<span class="code-attr">async</span><br />
-          &gt;&lt;/<span class="code-tag">script</span>&gt;
-        </div>
-
-        <div class="detail-list">
-          <div class="detail-item">
-            <span class="detail-label">Endpoint</span>
-            <span class="detail-val">https://preprod.intentick.com/intentick_widget.js</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Active Collect ID</span>
-            <span class="detail-val" id="detail-active-id">Intentick_widget_r7v9swxw</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Default Collect ID</span>
-            <span class="detail-val">Intentick_widget_r7v9swxw</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">ID Storage State</span>
-            <span class="detail-val" id="detail-storage-status">Default (Fallback)</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- Card 2: Interactive Controls & Quick Actions -->
-      <section class="card">
-        <div class="card-header">
-          <h2 class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            Widget Controls & ID Management
-          </h2>
-        </div>
-
-        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 1.25rem;">
-          You can test different Intentick widget identifiers without editing code. Use the top-left button or the triggers below:
-        </p>
-
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-          <button class="btn btn-primary" onclick="openChangeIdPrompt()" style="width: 100%; justify-content: center;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-            </svg>
-            Trigger Built-in Prompt & Update ID
-          </button>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-            <button class="btn btn-secondary" onclick="checkWidgetMount()" style="justify-content: center; font-size: 0.8rem;">
-              🔍 Inspect Widget Mount
-            </button>
-            <button class="btn btn-secondary" onclick="triggerTestEvent('SAMPLE_CLICK')" style="justify-content: center; font-size: 0.8rem;">
-              ⚡ Fire Test Click Event
-            </button>
-          </div>
-        </div>
-
-        <div style="margin-top: 1.25rem; padding: 0.85rem; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 8px; font-size: 0.8rem; color: #c7d2fe;">
-          💡 <strong>How it works:</strong> Submitting a new ID via prompt saves the value in <code style="font-family: var(--font-mono); color: #fff;">localStorage</code> and URL parameters, displays the confirmation <code style="font-family: var(--font-mono); color: #fff;">alert()</code>, and cleanly applies the new ID to the widget script.
-        </div>
-      </section>
-    </div>
-
-    <!-- Testbed Playground Content for Widget Interaction -->
-    <section>
-      <h2 class="section-title">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-          <line x1="8" y1="21" x2="16" y2="21"></line>
-          <line x1="12" y1="17" x2="12" y2="21"></line>
-        </svg>
-        Visitor Intent Simulation Elements
-      </h2>
-
-      <div class="interactive-grid">
-        <!-- Interactive CTA Box -->
-        <div class="action-card">
-          <h3>🎯 High-Intent CTA Triggers</h3>
-          <p>Click these buttons to test if the Intentick widget captures click events and tracks user interest.</p>
-          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <button class="btn btn-primary" onclick="handleIntentClick('Request Enterprise Demo')">
-              Request Enterprise Demo
-            </button>
-            <button class="btn btn-secondary" onclick="handleIntentClick('Download Whitepaper PDF')">
-              Download 2026 AI Report
-            </button>
-            <button class="btn btn-secondary" onclick="handleIntentClick('View Pricing Tier Enterprise')">
-              Explore Custom Pricing
-            </button>
-          </div>
-        </div>
-
-        <!-- Sample Lead Generation Form -->
-        <div class="action-card">
-          <h3>📝 Lead Form Intent Test</h3>
-          <p>Test form field interactions, email focus, and submission signals captured by the widget.</p>
-          <form class="test-form" onsubmit="handleFormSubmit(event)">
-            <div class="form-group">
-              <label for="lead-name">Prospect Name</label>
-              <input type="text" id="lead-name" class="form-input" placeholder="e.g. Alex Mercer" required />
-            </div>
-            <div class="form-group">
-              <label for="lead-email">Business Email</label>
-              <input type="email" id="lead-email" class="form-input" placeholder="alex@acmecorp.com" required />
-            </div>
-            <div class="form-group">
-              <label for="lead-intent">Target Use Case</label>
-              <select id="lead-intent" class="form-input" style="background: #090d16;">
-                <option value="intent-scoring">Visitor Intent Scoring</option>
-                <option value="widget-analytics">Widget Engagement Analytics</option>
-                <option value="pipeline-generation">Automated Pipeline Acceleration</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary" style="margin-top: 0.25rem;">
-              Submit Intent Test Form
-            </button>
-          </form>
-        </div>
-
-        <!-- Simulated Product Features / Intent Depth -->
-        <div class="action-card">
-          <h3>⚡ Feature Card Interaction</h3>
-          <p>Simulates visitor dwell time and feature exploration triggers.</p>
-          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <div style="padding: 0.75rem; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer;" onclick="handleIntentClick('Feature: Real-time WebSockets')">
-              <div style="font-weight: 600; font-size: 0.85rem; color: #fff;">WebSockets Sync</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Real-time bi-directional pipeline update</div>
-            </div>
-            <div style="padding: 0.75rem; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer;" onclick="handleIntentClick('Feature: Smart Intent Detection')">
-              <div style="font-weight: 600; font-size: 0.85rem; color: #fff;">Smart Intent Scoring</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">Calculates high-propensity buying signals</div>
-            </div>
-            <div style="padding: 0.75rem; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer;" onclick="handleIntentClick('Feature: Privacy Compliant')">
-              <div style="font-weight: 600; font-size: 0.85rem; color: #fff;">Zero-PII Storage</div>
-              <div style="font-size: 0.75rem; color: var(--text-muted);">GDPR & CCPA compliant tracking</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <section class="content-card">
+      <h2>About Intentick</h2>
+      <p>
+        Intentick is a visitor intent intelligence platform designed to identify, analyze, and engage high-intent visitors on your website in real-time. By tracking on-page buyer signals and behavioural indicators, Intentick empowers marketing and revenue teams to deliver personalized engagement when visitor interest is at its peak.
+      </p>
+      <p>
+        This test page integrates the preproduction widget bundle directly from <code>https://preprod.intentick.com/intentick_widget.js</code> with dynamic Collect ID injection.
+      </p>
     </section>
 
-    <!-- Activity & Event Console -->
-    <section class="console-card">
-      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
-        <div style="font-size: 0.875rem; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
-          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #06b6d4;"></span>
-          Test Activity Console Log
-        </div>
-        <button class="btn btn-secondary btn-sm" onclick="clearConsoleLog()">Clear Log</button>
-      </div>
-      <div class="console-logs" id="console-logs-container">
-        <!-- Logs populated dynamically -->
-      </div>
+    <section class="content-card">
+      <h2>Key Capabilities</h2>
+      <ul class="features-list">
+        <li>
+          <span class="bullet">✔</span>
+          <div><strong>Intent Signal Detection:</strong> Identifies high-value buyer journeys based on content engagement and navigation depth.</div>
+        </li>
+        <li>
+          <span class="bullet">✔</span>
+          <div><strong>Dynamic Widget Delivery:</strong> Serves interactive components and capture triggers tailored to visitor readiness.</div>
+        </li>
+        <li>
+          <span class="bullet">✔</span>
+          <div><strong>Real-time Analytics:</strong> Seamlessly synchronizes interaction events with your revenue pipeline and data stack.</div>
+        </li>
+      </ul>
     </section>
   </main>
 
-  <!-- Toast Element -->
-  <div id="toast">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
-    <span id="toast-message">Notification</span>
-  </div>
-
   <footer>
-    <p>Intentick Preprod Testing Environment &bull; Default Collect ID: <code>Intentick_widget_r7v9swxw</code> &bull; Host: <code>preprod.intentick.com</code></p>
+    <p>Intentick Preprod Testing &bull; Default Collect ID: <code>Intentick_widget_r7v9swxw</code></p>
   </footer>
 
-  <!-- Application Logic -->
+  <!-- Script for ID switching and Dark/Light Mode toggle -->
   <script>
     const DEFAULT_ID = "Intentick_widget_r7v9swxw";
 
-    // Helper: Retrieve active collect ID
-    function getActiveCollectId() {
+    function getActiveId() {
       const urlParams = new URLSearchParams(window.location.search);
-      const queryId = urlParams.get("collect_id");
-      const savedId = localStorage.getItem("intentick_collect_id");
-      return (queryId && queryId.trim()) || (savedId && savedId.trim()) || DEFAULT_ID;
+      return urlParams.get("collect_id") || localStorage.getItem("intentick_collect_id") || DEFAULT_ID;
     }
 
-    // Logging utility
-    function logEvent(type, message) {
-      const container = document.getElementById("console-logs-container");
-      if (!container) return;
+    // Top-left button: Built-in prompt & alert to change Collect ID
+    function changeWidgetId() {
+      const current = getActiveId();
+      const input = window.prompt("Enter Intentick Collect ID:", current);
 
-      const timeStr = new Date().toLocaleTimeString();
-      const line = document.createElement("div");
-      line.className = "log-line";
-      line.innerHTML = `
-        <span class="log-time">[${timeStr}]</span>
-        <span class="log-type">[${type}]</span>
-        <span class="log-msg">${message}</span>
-      `;
-      container.prepend(line);
-    }
+      if (input === null) return; // User cancelled
 
-    function clearConsoleLog() {
-      const container = document.getElementById("console-logs-container");
-      if (container) {
-        container.innerHTML = '';
-        logEvent("SYSTEM", "Console log cleared.");
-      }
-    }
-
-    function showToast(message) {
-      const toast = document.getElementById("toast");
-      const msg = document.getElementById("toast-message");
-      if (!toast || !msg) return;
-      msg.textContent = message;
-      toast.classList.add("show");
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3000);
-    }
-
-    // Core User Requirement:
-    // "in top left we have to keep one btn to enter the id width alert or prompt of built it and once input and submited mkae usre using that script id for the added scriot and once changed we have to change it"
-    function openChangeIdPrompt() {
-      const currentId = getActiveCollectId();
-      
-      // 1. Built-in Prompt dialog
-      const userInput = window.prompt(
-        "Enter the Intentick Collect ID for the widget:\n(Current ID: " + currentId + ")",
-        currentId
-      );
-
-      // User pressed Cancel
-      if (userInput === null) {
-        logEvent("PROMPT_CANCELLED", "User cancelled ID update dialog.");
+      const newId = input.trim();
+      if (!newId) {
+        window.alert("Collect ID cannot be empty.");
         return;
       }
 
-      const trimmedId = userInput.trim();
-      if (!trimmedId) {
-        window.alert("Invalid Input: Collect ID cannot be empty.");
-        return;
-      }
+      // Persist new ID
+      localStorage.setItem("intentick_collect_id", newId);
 
-      // 2. Persist new ID
-      localStorage.setItem("intentick_collect_id", trimmedId);
-
-      // Update URL search parameters
       const url = new URL(window.location.href);
-      url.searchParams.set("collect_id", trimmedId);
+      url.searchParams.set("collect_id", newId);
 
-      // 3. Built-in Alert confirmation
-      window.alert(
-        "✅ Intentick Collect ID Updated Successfully!\n\n" +
-        "New Script Collect ID: " + trimmedId + "\n\n" +
-        "The page will now reload with this script configuration."
-      );
+      // Built-in alert confirmation
+      window.alert("Intentick Collect ID updated to: " + newId + "\n\nReloading page with the new script ID...");
 
-      logEvent("ID_UPDATED", `Collect ID updated to: ${trimmedId}. Reloading page...`);
-
-      // 4. Reload page to initialize widget with new ID cleanly
+      // Reload with new ID
       window.location.href = url.toString();
     }
 
-    // Reset to default ID
-    function resetToDefaultId() {
-      if (confirm("Reset the Intentick Collect ID back to default (" + DEFAULT_ID + ")?")) {
+    // Reset to default
+    function resetWidgetId() {
+      if (confirm("Reset Collect ID back to default (" + DEFAULT_ID + ")?")) {
         localStorage.removeItem("intentick_collect_id");
         const url = new URL(window.location.href);
         url.searchParams.delete("collect_id");
-        window.alert("Reset to default ID: " + DEFAULT_ID);
+        window.alert("Reset back to default: " + DEFAULT_ID);
         window.location.href = url.toString();
       }
     }
 
-    // Copy script snippet to clipboard
-    function copyCurrentScriptTag() {
-      const activeId = getActiveCollectId();
-      const snippet = `<script\n  src="https://preprod.intentick.com/intentick_widget.js"\n  data-collect-id="${activeId}"\n  async\n><\/script>`;
-      
-      navigator.clipboard.writeText(snippet).then(() => {
-        showToast("Script tag copied to clipboard!");
-        logEvent("COPY", "Copied script tag snippet for ID: " + activeId);
-      }).catch(() => {
-        window.prompt("Copy script tag manually:", snippet);
-      });
+    // Dark / Light Mode Toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute("data-theme") || "dark";
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+      html.setAttribute("data-theme", newTheme);
+      localStorage.setItem("intentick_theme", newTheme);
+      updateThemeButton(newTheme);
     }
 
-    // Inspect if widget created its mount DOM
-    function checkWidgetMount() {
-      const mountNode = document.getElementById("intentick-widget-mount");
-      const scriptTag = document.getElementById("intentick-widget-script");
-      const collectIdAttr = scriptTag ? scriptTag.getAttribute("data-collect-id") : null;
-
-      if (mountNode) {
-        window.alert(
-          "Widget Mount Status: FOUND (#intentick-widget-mount)\n" +
-          "Children elements: " + mountNode.children.length + "\n" +
-          "Script data-collect-id: " + collectIdAttr
-        );
-        logEvent("INSPECT", "Widget mount node present with " + mountNode.children.length + " children.");
+    function updateThemeButton(theme) {
+      const btn = document.getElementById("theme-btn");
+      if (!btn) return;
+      if (theme === "dark") {
+        btn.innerHTML = `<span>☀️</span> Light Mode`;
       } else {
-        window.alert(
-          "Widget Mount Status: NOT DETECTED YET.\n\n" +
-          "Script Tag: " + (scriptTag ? "Present (data-collect-id=" + collectIdAttr + ")" : "Not found") + "\n" +
-          "Note: If preprod.intentick.com is offline or blocked by ad-blocker, the mount element might not be generated."
-        );
-        logEvent("INSPECT", "Widget mount node (#intentick-widget-mount) not found in DOM yet.");
+        btn.innerHTML = `<span>🌙</span> Dark Mode`;
       }
     }
 
-    // Interaction Handlers for Sandbox
-    function handleIntentClick(actionName) {
-      logEvent("INTERACTION", `Clicked CTA: "${actionName}"`);
-      showToast(`Triggered: ${actionName}`);
-    }
-
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      const name = document.getElementById("lead-name").value;
-      const email = document.getElementById("lead-email").value;
-      const intent = document.getElementById("lead-intent").value;
-
-      logEvent("FORM_SUBMIT", `Form submitted by ${name} (${email}) for [${intent}]`);
-      showToast("Test form submitted! Check console for event.");
-      e.target.reset();
-    }
-
-    function triggerTestEvent(name) {
-      logEvent("CUSTOM_EVENT", `Manually dispatched event: ${name}`);
-      showToast(`Fired event: ${name}`);
-    }
-
-    // Initialize UI on DOMContentLoaded
+    // Initialize display & theme on load
     document.addEventListener("DOMContentLoaded", function () {
-      const activeId = getActiveCollectId();
-      const isDefault = (activeId === DEFAULT_ID);
+      const activeId = getActiveId();
+      const displayEl = document.getElementById("display-id");
+      if (displayEl) displayEl.textContent = activeId;
 
-      // Update UI elements
-      document.getElementById("current-id-display").textContent = activeId;
-      document.getElementById("code-snippet-id").textContent = activeId;
-      document.getElementById("detail-active-id").textContent = activeId;
-
-      const storageStatusEl = document.getElementById("detail-storage-status");
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get("collect_id")) {
-        storageStatusEl.textContent = "Custom (From URL Query ?collect_id=...)";
-        storageStatusEl.style.color = "#38bdf8";
-      } else if (localStorage.getItem("intentick_collect_id")) {
-        storageStatusEl.textContent = "Custom (From localStorage)";
-        storageStatusEl.style.color = "#a78bfa";
-      } else {
-        storageStatusEl.textContent = "Default Built-in (" + DEFAULT_ID + ")";
-        storageStatusEl.style.color = "#34d399";
-      }
-
-      // Initial activity log entries
-      logEvent("INIT", "Environment: Preprod (https://preprod.intentick.com/intentick_widget.js)");
-      logEvent("INIT", "Active data-collect-id: " + activeId);
-      if (!isDefault) {
-        logEvent("CONFIG", "Custom Collect ID loaded from persistent storage.");
-      }
+      const savedTheme = localStorage.getItem("intentick_theme") || "dark";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      updateThemeButton(savedTheme);
     });
   </script>
 </body>
