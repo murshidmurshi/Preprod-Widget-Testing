@@ -147,24 +147,7 @@
       transform: scale(0.98);
     }
 
-    .btn-reset {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 0.45rem 0.65rem;
-      font-size: 0.8rem;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.15s ease;
-      touch-action: manipulation;
-      min-height: 36px;
-    }
 
-    .btn-reset:hover {
-      color: var(--text);
-      background: var(--badge-bg);
-    }
 
     .btn-clear {
       background: transparent;
@@ -362,11 +345,7 @@
         ✏️ Change Widget ID
       </button>
 
-      <button class="btn-reset" onclick="resetWidgetId()" title="Reset to default ID" aria-label="Reset Collect ID">
-        ↺
-      </button>
-
-      <button class="btn-clear" onclick="clearStorageExceptId()" title="Clear all widget sessions, history & cache (keeps active Collect ID)" aria-label="Clear Storage Except ID">
+      <button class="btn-clear" id="btn-clear-storage" onclick="clearStorage()" title="Clear chat history and storage (preserves current Collect ID)" aria-label="Clear Storage">
         🧹 Clear Storage
       </button>
 
@@ -425,39 +404,29 @@
       window.location.href = url.toString();
     }
 
-    function resetWidgetId() {
-      if (confirm("Reset Collect ID back to default (" + DEFAULT_ID + ")?")) {
-        localStorage.removeItem("intentick_collect_id");
-        const url = new URL(window.location.href);
-        url.searchParams.delete("collect_id");
-        window.location.href = url.toString();
+    async function clearStorage() {
+      const btn = document.getElementById("btn-clear-storage");
+      if (btn) {
+        btn.textContent = "⏳ Clearing...";
+        btn.disabled = true;
       }
-    }
 
-    async function clearStorageExceptId() {
+      // 1. Always retain current active or newly added Collect ID and theme
       const activeId = getActiveId();
-      if (!confirm("Clear all widget storage, chat history, and cache?\n\nActive Collect ID (" + activeId + ") will be preserved.")) {
-        return;
-      }
+      const currentTheme = document.documentElement.getAttribute("data-theme") || localStorage.getItem("intentick_theme") || "light";
 
-      // 1. Preserve active Collect ID and theme
-      const savedCollectId = localStorage.getItem("intentick_collect_id") || activeId;
-      const savedTheme = localStorage.getItem("intentick_theme") || "light";
-
-      // 2. Clear all localStorage items
+      // 2. Completely wipe all localStorage
       try {
         localStorage.clear();
       } catch (e) {
         console.warn("localStorage clear error:", e);
       }
 
-      // 3. Restore preserved Collect ID and theme
-      if (savedCollectId) {
-        localStorage.setItem("intentick_collect_id", savedCollectId);
+      // 3. Re-save the active/added Collect ID and theme
+      if (activeId) {
+        localStorage.setItem("intentick_collect_id", activeId);
       }
-      if (savedTheme) {
-        localStorage.setItem("intentick_theme", savedTheme);
-      }
+      localStorage.setItem("intentick_theme", currentTheme);
 
       // 4. Clear all sessionStorage
       try {
@@ -466,7 +435,7 @@
         console.warn("sessionStorage clear error:", e);
       }
 
-      // 5. Delete IndexedDB database (IntentickDB and any others)
+      // 5. Delete IndexedDB databases (IntentickDB and any other stores)
       try {
         if (window.indexedDB) {
           if (typeof window.indexedDB.databases === "function") {
@@ -478,7 +447,7 @@
                     return new Promise((resolve) => {
                       const req = window.indexedDB.deleteDatabase(dbInfo.name);
                       req.onsuccess = req.onerror = req.onblocked = resolve;
-                      setTimeout(resolve, 300);
+                      setTimeout(resolve, 200);
                     });
                   }
                 })
@@ -488,17 +457,17 @@
           await new Promise((resolve) => {
             const req = window.indexedDB.deleteDatabase("IntentickDB");
             req.onsuccess = req.onerror = req.onblocked = resolve;
-            setTimeout(resolve, 300);
+            setTimeout(resolve, 200);
           });
         }
       } catch (e) {
         console.warn("IndexedDB delete error:", e);
       }
 
-      // 6. Reload page keeping collect_id query param
+      // 6. Reload with the active/added Collect ID intact in the URL
       const url = new URL(window.location.href);
-      if (savedCollectId) {
-        url.searchParams.set("collect_id", savedCollectId);
+      if (activeId) {
+        url.searchParams.set("collect_id", activeId);
       }
       window.location.href = url.toString();
     }
