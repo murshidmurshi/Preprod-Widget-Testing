@@ -166,6 +166,34 @@
       background: var(--badge-bg);
     }
 
+    .btn-clear {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+
+    .btn-clear:hover {
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .btn-clear:active {
+      transform: scale(0.98);
+    }
+
     .id-badge {
       display: inline-flex;
       align-items: center;
@@ -302,6 +330,11 @@
         padding: 0.4rem 0.7rem;
       }
 
+      .btn-clear {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.5rem;
+      }
+
       .top-right {
         margin-left: auto;
       }
@@ -331,6 +364,10 @@
 
       <button class="btn-reset" onclick="resetWidgetId()" title="Reset to default ID" aria-label="Reset Collect ID">
         ↺
+      </button>
+
+      <button class="btn-clear" onclick="clearStorageExceptId()" title="Clear all widget sessions, history & cache (keeps active Collect ID)" aria-label="Clear Storage Except ID">
+        🧹 Clear Storage
       </button>
 
       <span class="id-badge" title="Active Collect ID">
@@ -395,6 +432,75 @@
         url.searchParams.delete("collect_id");
         window.location.href = url.toString();
       }
+    }
+
+    async function clearStorageExceptId() {
+      const activeId = getActiveId();
+      if (!confirm("Clear all widget storage, chat history, and cache?\n\nActive Collect ID (" + activeId + ") will be preserved.")) {
+        return;
+      }
+
+      // 1. Preserve active Collect ID and theme
+      const savedCollectId = localStorage.getItem("intentick_collect_id") || activeId;
+      const savedTheme = localStorage.getItem("intentick_theme") || "light";
+
+      // 2. Clear all localStorage items
+      try {
+        localStorage.clear();
+      } catch (e) {
+        console.warn("localStorage clear error:", e);
+      }
+
+      // 3. Restore preserved Collect ID and theme
+      if (savedCollectId) {
+        localStorage.setItem("intentick_collect_id", savedCollectId);
+      }
+      if (savedTheme) {
+        localStorage.setItem("intentick_theme", savedTheme);
+      }
+
+      // 4. Clear all sessionStorage
+      try {
+        sessionStorage.clear();
+      } catch (e) {
+        console.warn("sessionStorage clear error:", e);
+      }
+
+      // 5. Delete IndexedDB database (IntentickDB and any others)
+      try {
+        if (window.indexedDB) {
+          if (typeof window.indexedDB.databases === "function") {
+            try {
+              const dbs = await window.indexedDB.databases();
+              await Promise.all(
+                dbs.map((dbInfo) => {
+                  if (dbInfo.name) {
+                    return new Promise((resolve) => {
+                      const req = window.indexedDB.deleteDatabase(dbInfo.name);
+                      req.onsuccess = req.onerror = req.onblocked = resolve;
+                      setTimeout(resolve, 300);
+                    });
+                  }
+                })
+              );
+            } catch (_) {}
+          }
+          await new Promise((resolve) => {
+            const req = window.indexedDB.deleteDatabase("IntentickDB");
+            req.onsuccess = req.onerror = req.onblocked = resolve;
+            setTimeout(resolve, 300);
+          });
+        }
+      } catch (e) {
+        console.warn("IndexedDB delete error:", e);
+      }
+
+      // 6. Reload page keeping collect_id query param
+      const url = new URL(window.location.href);
+      if (savedCollectId) {
+        url.searchParams.set("collect_id", savedCollectId);
+      }
+      window.location.href = url.toString();
     }
 
     function toggleTheme() {

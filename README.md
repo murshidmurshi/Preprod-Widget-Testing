@@ -14,6 +14,7 @@ Testbed and dynamic script loader for the Intentick Preprod Widget with customiz
   ```
 - **Default Collect ID**: `Intentick_widget_r7v9swxw`
 - **Dynamic ID Switching**: A built-in button in the top-left triggers a native browser `prompt()` to input a custom Collect ID, displays an `alert()` confirmation, and reloads the page with persistent `localStorage` and URL parameters (`?collect_id=...`).
+- **Clear Storage (Preserve Collect ID)**: A built-in "🧹 Clear Storage" button in the top navigation wipes all stored widget chat sessions, attribution, welcome states, and IndexedDB cache (`IntentickDB`) from browser storage while safely preserving the currently active Collect ID for clean testing.
 - **Interactive Test Sandbox**: Includes high-intent CTA click targets, sample lead generation form, feature interaction cards, and a real-time event console.
 
 ## Getting Started
