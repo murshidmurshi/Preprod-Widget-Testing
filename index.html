@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Intentick Preprod Testing Widget</title>
-  <meta name="description" content="Intentick Preprod Mobile & Desktop Testing" />
+  <title id="page-title">Intentick Preprod Testing Widget</title>
+  <meta name="description" id="page-description" content="Intentick Preprod Mobile & Desktop Testing" />
   <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -15,20 +15,31 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Dynamic Script Loader for Preprod Widget -->
+  <!-- Dynamic Script Loader for Preprod / Production Widget -->
   <script>
     (function () {
       const DEFAULT_COLLECT_ID = "Intentick_widget_r7v9swxw";
       const urlParams = new URLSearchParams(window.location.search);
+
+      // Environment detection: 'preprod' or 'production' (default: preprod)
+      let envParam = (urlParams.get("env") || localStorage.getItem("intentick_env") || "preprod").toLowerCase();
+      if (envParam === "prod") envParam = "production";
+      const activeEnv = envParam === "production" ? "production" : "preprod";
+
       const activeId = urlParams.get("collect_id") || localStorage.getItem("intentick_collect_id") || DEFAULT_COLLECT_ID;
 
       window.__ACTIVE_COLLECT_ID__ = activeId;
+      window.__ACTIVE_ENV__ = activeEnv;
+
+      const widgetScriptUrl = activeEnv === "production"
+        ? "https://intentick.com/intentick_widget.js"
+        : "https://preprod.intentick.com/intentick_widget.js";
 
       function injectWidgetScript() {
         if (document.getElementById("intentick-widget-script")) return;
         const script = document.createElement("script");
         script.id = "intentick-widget-script";
-        script.src = "https://preprod.intentick.com/intentick_widget.js";
+        script.src = widgetScriptUrl;
         script.setAttribute("data-collect-id", activeId);
         script.async = true;
         (document.body || document.head || document.documentElement).appendChild(script);
@@ -97,7 +108,7 @@
       transition: background-color 0.2s ease, color 0.2s ease;
     }
 
-    /* Top Navigation Header with Change Widget ID on Top-Left */
+    /* Top Navigation Header with Actions on Top-Left and Controls on Top-Right */
     header {
       position: sticky;
       top: 0;
@@ -147,14 +158,12 @@
       transform: scale(0.98);
     }
 
-
-
     .btn-clear {
       background: transparent;
       color: var(--text-muted);
       border: 1px solid var(--border);
       border-radius: 7px;
-      padding: 0.45rem 0.65rem;
+      padding: 0.45rem 0.75rem;
       font-size: 0.8rem;
       cursor: pointer;
       font-family: inherit;
@@ -203,11 +212,52 @@
       flex-shrink: 0;
     }
 
-    /* Top-Right Theme Toggle */
+    /* Top-Right Area: Environment Switcher + Theme Toggle */
     .top-right {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Segmented Environment Control */
+    .env-switch-wrap {
+      display: inline-flex;
+      align-items: center;
+      background: var(--badge-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .env-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+      min-height: 32px;
+      white-space: nowrap;
+    }
+
+    .env-btn:hover {
+      color: var(--text);
+    }
+
+    .env-btn.active {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
 
     .theme-toggle-btn {
@@ -249,20 +299,32 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.85rem;
     }
 
     .pill-status {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.2rem 0.6rem;
+      padding: 0.25rem 0.75rem;
       border-radius: 9999px;
       background: rgba(79, 70, 229, 0.08);
       color: var(--accent);
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.03em;
+      transition: all 0.2s ease;
+    }
+
+    .pill-status.pill-prod {
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    :root[data-theme="dark"] .pill-status.pill-prod {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.18);
     }
 
     h1 {
@@ -271,12 +333,13 @@
       letter-spacing: -0.02em;
       line-height: 1.25;
       color: var(--text);
+      transition: color 0.2s ease;
     }
 
     p.subtext {
       font-size: 0.95rem;
       color: var(--text-muted);
-      max-width: 440px;
+      max-width: 460px;
       line-height: 1.55;
     }
 
@@ -289,6 +352,15 @@
       padding-bottom: max(env(safe-area-inset-bottom, 0px), 1.25rem);
     }
 
+    footer code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      font-size: 0.74rem;
+      background: var(--badge-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
     /* Mobile Responsive Optimizations */
     @media (max-width: 640px) {
       header {
@@ -299,18 +371,18 @@
       .top-left {
         gap: 0.45rem;
         width: 100%;
-        justify-content: space-between;
+        justify-content: flex-start;
       }
 
       .id-badge {
-        max-width: 160px;
+        max-width: 150px;
         font-size: 0.74rem;
         padding: 0.35rem 0.5rem;
       }
 
       .btn-action {
         font-size: 0.78rem;
-        padding: 0.4rem 0.7rem;
+        padding: 0.4rem 0.65rem;
       }
 
       .btn-clear {
@@ -319,7 +391,14 @@
       }
 
       .top-right {
-        margin-left: auto;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .env-btn {
+        font-size: 0.72rem;
+        padding: 0.3rem 0.5rem;
+        min-height: 28px;
       }
 
       main {
@@ -338,14 +417,14 @@
 </head>
 <body>
 
-  <!-- Top Navigation Header with Change Widget Option on Top-Left -->
+  <!-- Top Navigation Header with Actions on Top-Left and Environment/Theme Controls on Top-Right -->
   <header>
     <div class="top-left">
       <button class="btn-action" onclick="changeWidgetId()" aria-label="Change Widget ID">
         ✏️ Change Widget ID
       </button>
 
-      <button class="btn-clear" id="btn-clear-storage" onclick="clearStorage()" title="Clear chat history and storage (preserves current Collect ID)" aria-label="Clear Storage">
+      <button class="btn-clear" id="btn-clear-storage" onclick="clearStorage()" title="Clear chat history and storage (preserves current Collect ID & Environment)" aria-label="Clear Storage">
         🧹 Clear Storage
       </button>
 
@@ -356,34 +435,115 @@
     </div>
 
     <div class="top-right">
+      <!-- Environment Switcher Segmented Control -->
+      <div class="env-switch-wrap" role="group" aria-label="Environment Selection">
+        <button class="env-btn active" id="btn-env-preprod" onclick="setEnvironment('preprod')" title="Switch to Preprod Widget (preprod.intentick.com)">
+          🧪 Preprod
+        </button>
+        <button class="env-btn" id="btn-env-prod" onclick="setEnvironment('production')" title="Switch to Production Widget (intentick.com)">
+          🚀 Production
+        </button>
+      </div>
+
       <button class="theme-toggle-btn" id="theme-btn" onclick="toggleTheme()" aria-label="Toggle Dark/Light Mode">
         <span id="theme-icon">🌙</span> <span id="theme-label">Dark</span>
       </button>
     </div>
   </header>
 
-  <!-- Clean, Simple & Light Background -->
+  <!-- Clean, Simple & Light Background (Dynamically updates with Environment) -->
   <main>
     <div class="minimal-wrap">
-      <span class="pill-status">Preprod Environment</span>
-      <h1>Intentick Preprod Testing</h1>
-      <p class="subtext">
-        Lightweight host page for testing the Intentick widget script on mobile and desktop devices.
+      <span class="pill-status" id="main-pill">Preprod Environment</span>
+      <h1 id="main-title">Intentick Preprod Testing</h1>
+      <p class="subtext" id="main-subtext">
+        Lightweight host page for testing the Intentick Preprod widget script on mobile and desktop devices.
       </p>
     </div>
   </main>
 
   <footer>
-    <p>Intentick Preprod &bull; <code>https://preprod.intentick.com/intentick_widget.js</code></p>
+    <p><span id="footer-env-label">Intentick Preprod</span> &bull; <code id="footer-script-url">https://preprod.intentick.com/intentick_widget.js</code></p>
   </footer>
 
-  <!-- Script Logic for ID Switching and Theme Toggle -->
+  <!-- Script Logic for ID Switching, Environment Switching and Theme Toggle -->
   <script>
     const DEFAULT_ID = "Intentick_widget_r7v9swxw";
+
+    function getActiveEnv() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let env = (urlParams.get("env") || localStorage.getItem("intentick_env") || "preprod").toLowerCase();
+      if (env === "prod") env = "production";
+      return env === "production" ? "production" : "preprod";
+    }
 
     function getActiveId() {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get("collect_id") || localStorage.getItem("intentick_collect_id") || DEFAULT_ID;
+    }
+
+    function setEnvironment(targetEnv) {
+      const currentEnv = getActiveEnv();
+      if (currentEnv === targetEnv) return;
+
+      localStorage.setItem("intentick_env", targetEnv);
+      const url = new URL(window.location.href);
+      url.searchParams.set("env", targetEnv);
+      window.location.href = url.toString();
+    }
+
+    function updateEnvironmentDisplay(env) {
+      const isProd = env === "production";
+      const pill = document.getElementById("main-pill");
+      const title = document.getElementById("main-title");
+      const subtext = document.getElementById("main-subtext");
+      const footerEnv = document.getElementById("footer-env-label");
+      const footerUrl = document.getElementById("footer-script-url");
+      const btnPreprod = document.getElementById("btn-env-preprod");
+      const btnProd = document.getElementById("btn-env-prod");
+
+      document.title = isProd
+        ? "Intentick Production Testing Widget"
+        : "Intentick Preprod Testing Widget";
+
+      if (pill) {
+        pill.textContent = isProd ? "🚀 Production Environment" : "🧪 Preprod Environment";
+        if (isProd) {
+          pill.classList.add("pill-prod");
+        } else {
+          pill.classList.remove("pill-prod");
+        }
+      }
+
+      if (title) {
+        title.textContent = isProd ? "Intentick Production Testing" : "Intentick Preprod Testing";
+      }
+
+      if (subtext) {
+        subtext.textContent = isProd
+          ? "Lightweight host page for testing the Intentick Production widget script on mobile and desktop devices."
+          : "Lightweight host page for testing the Intentick Preprod widget script on mobile and desktop devices.";
+      }
+
+      if (footerEnv) {
+        footerEnv.textContent = isProd ? "Intentick Production" : "Intentick Preprod";
+      }
+
+      if (footerUrl) {
+        footerUrl.textContent = isProd
+          ? "https://intentick.com/intentick_widget.js"
+          : "https://preprod.intentick.com/intentick_widget.js";
+      }
+
+      if (btnPreprod && btnProd) {
+        if (isProd) {
+          btnProd.classList.add("active");
+          btnPreprod.classList.remove("active");
+        } else {
+          btnPreprod.classList.add("active");
+          btnProd.classList.remove("active");
+        }
+      }
     }
 
     function changeWidgetId() {
@@ -411,8 +571,9 @@
         btn.disabled = true;
       }
 
-      // 1. Always retain current active or newly added Collect ID and theme
+      // 1. Always retain current active Collect ID, environment, and theme
       const activeId = getActiveId();
+      const activeEnv = getActiveEnv();
       const currentTheme = document.documentElement.getAttribute("data-theme") || localStorage.getItem("intentick_theme") || "light";
 
       // 2. Completely wipe all localStorage
@@ -422,10 +583,11 @@
         console.warn("localStorage clear error:", e);
       }
 
-      // 3. Re-save the active/added Collect ID and theme
+      // 3. Re-save the active Collect ID, environment, and theme
       if (activeId) {
         localStorage.setItem("intentick_collect_id", activeId);
       }
+      localStorage.setItem("intentick_env", activeEnv);
       localStorage.setItem("intentick_theme", currentTheme);
 
       // 4. Clear all sessionStorage
@@ -464,10 +626,13 @@
         console.warn("IndexedDB delete error:", e);
       }
 
-      // 6. Reload with the active/added Collect ID intact in the URL
+      // 6. Reload with the active Collect ID & environment intact in the URL
       const url = new URL(window.location.href);
       if (activeId) {
         url.searchParams.set("collect_id", activeId);
+      }
+      if (activeEnv) {
+        url.searchParams.set("env", activeEnv);
       }
       window.location.href = url.toString();
     }
@@ -500,8 +665,12 @@
 
     document.addEventListener("DOMContentLoaded", function () {
       const activeId = getActiveId();
+      const activeEnv = getActiveEnv();
+
       const displayEl = document.getElementById("display-id");
       if (displayEl) displayEl.textContent = activeId;
+
+      updateEnvironmentDisplay(activeEnv);
 
       const savedTheme = localStorage.getItem("intentick_theme") || "light";
       document.documentElement.setAttribute("data-theme", savedTheme);
